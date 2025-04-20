@@ -24,7 +24,7 @@ public class UserService {
 
     public UserService() {
         try {
-            readPersonID("dataPersonId.txt", "\\s+");
+            readPersonID("resources/dataPersonId.txt", "\\s+");
         } catch (FileException e) {
             System.err.println("Nepodařilo se načíst personID: " + e.getMessage());
         }

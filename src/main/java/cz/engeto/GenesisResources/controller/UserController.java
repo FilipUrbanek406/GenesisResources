@@ -18,9 +18,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-        userService.addUser(user);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    public ResponseEntity<?> addUser(@RequestBody User user) {
+        try {
+            User savedUser = userService.addUser(user);
+            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>("personID již použito, uživatel nelze vytvořit",HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping

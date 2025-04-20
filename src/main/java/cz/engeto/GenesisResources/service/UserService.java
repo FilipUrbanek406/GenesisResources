@@ -1,12 +1,18 @@
 package cz.engeto.GenesisResources.service;
 
+import cz.engeto.GenesisResources.exception.FileException;
 import cz.engeto.GenesisResources.model.User;
 import cz.engeto.GenesisResources.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 @Service
 public class UserService {
@@ -14,8 +20,46 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public void addUser(User user) {
-        userRepository.save(user);
+    private List<String> availablePersonIDs = new ArrayList<>();
+
+    public UserService() {
+        try {
+            readPersonID("dataPersonId.txt", "\\s+");
+        } catch (FileException e) {
+            System.err.println("Nepodařilo se načíst personID: " + e.getMessage());
+        }
+    }
+
+    public User addUser(User user) throws IllegalArgumentException {
+        if (isPersonIDAlreadyUsed(user.getPersonID())) {
+            throw new IllegalArgumentException("PersonID již existuje v databázi!");
+        }
+
+        if (!availablePersonIDs.contains(user.getPersonID())) {
+            throw new IllegalArgumentException("Zadané personID není platné!");
+        }
+
+        return userRepository.save(user);
+    }
+
+    public boolean isPersonIDAlreadyUsed(String personID) {
+        return userRepository.findByPersonID(personID).isPresent();
+    }
+
+    public void readPersonID(String fileName, String delimiter) throws FileException {
+        int lineNumber = 0;
+        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))) {
+            while (scanner.hasNextLine()) {
+                lineNumber++;
+                String line = scanner.nextLine().trim();
+                if (!line.isEmpty()) {
+                    availablePersonIDs.add(line);
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+            throw new FileException("Nepodařilo se nalézt soubor: " + fileName + "!");
+        }
     }
 
     public List<User> getAllUsers() {

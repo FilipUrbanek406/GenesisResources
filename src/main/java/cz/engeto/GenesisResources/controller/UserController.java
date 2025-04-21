@@ -21,12 +21,16 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> addUser(@RequestBody User user) {
-        try {
-            User savedUser = userService.addUser(user);
-            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("personID již použito, uživatel nelze vytvořit",HttpStatus.BAD_REQUEST);
+        if (userService.isPersonIDAlreadyUsed(user.getPersonID())) {
+            return new ResponseEntity<>("PersonID již použito. Uživatel nelze vytvořit", HttpStatus.BAD_REQUEST);
         }
+
+        if (!userService.isPersonIDValid(user.getPersonID())) {
+            return new ResponseEntity<>("Zadané personID není platné. Uživatel nelze vytvořit", HttpStatus.BAD_REQUEST);
+        }
+
+        User savedUser = userService.saveUser(user);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -41,7 +45,7 @@ public class UserController {
         Optional<User> userOptional = userService.getUserById(id);
 
         if (userOptional.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Uživatel s tímto ID neexistuje", HttpStatus.NOT_FOUND);
         }
 
         User user = userOptional.get();
@@ -78,7 +82,7 @@ public class UserController {
         Optional<User> existingUserOptional = userService.getUserById(userDTO.getId());
 
         if (existingUserOptional.isEmpty()) {
-            return new ResponseEntity<>(userDTO, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Uživatel s tímto ID neexistuje", HttpStatus.NOT_FOUND);
         }
 
         User existingUser = existingUserOptional.get();
@@ -96,13 +100,13 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
         Optional<User> user = userService.deleteUserById(id);
 
         if (user.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Uživatel byl smazán", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Uživatel s tímto ID neexistuje", HttpStatus.NOT_FOUND);
         }
     }
 }

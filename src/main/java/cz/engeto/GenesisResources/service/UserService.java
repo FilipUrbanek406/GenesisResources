@@ -42,10 +42,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public boolean isPersonIDAlreadyUsed(String personID) {
-        return userRepository.findByPersonID(personID).isPresent();
-    }
-
     public void readPersonID(String fileName, String delimiter) throws FileException {
         int lineNumber = 0;
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))) {
@@ -60,6 +56,20 @@ public class UserService {
         } catch (FileNotFoundException e) {
             throw new FileException("Nepodařilo se nalézt soubor: " + fileName + "!");
         }
+    }
+
+    public boolean isPersonIDAlreadyUsed(String personID) {
+        return userRepository.findByPersonID(personID).isPresent();
+    }
+
+    public boolean isPersonIDValid(String personID) {
+        return availablePersonIDs.contains(personID);
+    }
+
+    public User saveUser(User user) {
+        String uuid = UUID.randomUUID().toString();
+        user.setUuid(uuid);
+        return userRepository.save(user);
     }
 
     public List<User> getAllUsers() {

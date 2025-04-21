@@ -72,6 +72,10 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
     public Optional<User> deleteUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {

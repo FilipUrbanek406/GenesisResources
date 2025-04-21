@@ -41,17 +41,17 @@ public class UserController {
         Optional<User> userOptional = userService.getUserById(id);
 
         if (userOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         User user = userOptional.get();
 
         if (Boolean.TRUE.equals(detail)) {
             UserDetailDTO detailDTO = convertToDetailDTO(user);
-            return ResponseEntity.ok(detailDTO);
+            return new ResponseEntity<>(detailDTO, HttpStatus.OK);
         } else {
             UserBasicDTO basicDTO = convertToBasicDTO(user);
-            return ResponseEntity.ok(basicDTO);
+            return new ResponseEntity<>(basicDTO, HttpStatus.OK);
         }
     }
 
@@ -71,6 +71,28 @@ public class UserController {
         dto.setPersonID(user.getPersonID());
         dto.setUuid(user.getUuid());
         return dto;
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updateUser(@RequestBody UserBasicDTO userDTO) {
+        Optional<User> existingUserOptional = userService.getUserById(userDTO.getId());
+
+        if (existingUserOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        User existingUser = existingUserOptional.get();
+        existingUser.setName(userDTO.getName());
+        existingUser.setSurname(userDTO.getSurname());
+
+        User updatedUser = userService.updateUser(existingUser);
+
+        UserBasicDTO responseDTO = new UserBasicDTO();
+        responseDTO.setId(updatedUser.getId());
+        responseDTO.setName(updatedUser.getName());
+        responseDTO.setSurname(updatedUser.getSurname());
+
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{id}")

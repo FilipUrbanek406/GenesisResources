@@ -78,7 +78,7 @@ public class UserController {
         Optional<User> existingUserOptional = userService.getUserById(userDTO.getId());
 
         if (existingUserOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(userDTO, HttpStatus.NOT_FOUND);
         }
 
         User existingUser = existingUserOptional.get();
@@ -92,7 +92,7 @@ public class UserController {
         responseDTO.setName(updatedUser.getName());
         responseDTO.setSurname(updatedUser.getSurname());
 
-        return ResponseEntity.ok(responseDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -100,9 +100,9 @@ public class UserController {
         Optional<User> user = userService.deleteUserById(id);
 
         if (user.isPresent()) {
-            return ResponseEntity.noContent().build();
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

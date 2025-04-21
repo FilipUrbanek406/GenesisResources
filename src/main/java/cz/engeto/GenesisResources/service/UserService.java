@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -38,6 +35,9 @@ public class UserService {
         if (!availablePersonIDs.contains(user.getPersonID())) {
             throw new IllegalArgumentException("Zadané personID není platné!");
         }
+
+        String uuid = UUID.randomUUID().toString();
+        user.setUuid(uuid);
 
         return userRepository.save(user);
     }
@@ -67,12 +67,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Integer id) {
+    public Optional<User> getUserById(Long id) {
 
         return userRepository.findById(id);
     }
 
-    public Optional<User> deleteUserById(Integer id) {
+    public Optional<User> deleteUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             userRepository.delete(user.get());

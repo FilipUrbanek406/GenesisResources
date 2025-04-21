@@ -12,7 +12,8 @@ public class User {
     private Long id;
     private String name;
     private String surname;
-    @Column(length = 12, nullable = false, unique = true)
+    @Column(length = 12, unique = true)
     private String personID;
+    @Column(unique = true)
     private String uuid;
 }

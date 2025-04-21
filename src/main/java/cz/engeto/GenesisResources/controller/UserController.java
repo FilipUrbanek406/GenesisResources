@@ -1,5 +1,7 @@
 package cz.engeto.GenesisResources.controller;
 
+import cz.engeto.GenesisResources.DTO.UserBasicDTO;
+import cz.engeto.GenesisResources.DTO.UserDetailDTO;
 import cz.engeto.GenesisResources.model.User;
 import cz.engeto.GenesisResources.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +36,45 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-        return userService.getUserById(id).map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> getUserById(@PathVariable Long id,
+                                         @RequestParam(required = false) Boolean detail) {
+        Optional<User> userOptional = userService.getUserById(id);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        User user = userOptional.get();
+
+        if (Boolean.TRUE.equals(detail)) {
+            UserDetailDTO detailDTO = convertToDetailDTO(user);
+            return ResponseEntity.ok(detailDTO);
+        } else {
+            UserBasicDTO basicDTO = convertToBasicDTO(user);
+            return ResponseEntity.ok(basicDTO);
+        }
+    }
+
+    private UserBasicDTO convertToBasicDTO(User user) {
+        UserBasicDTO dto = new UserBasicDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setSurname(user.getSurname());
+        return dto;
+    }
+
+    private UserDetailDTO convertToDetailDTO(User user) {
+        UserDetailDTO dto = new UserDetailDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setSurname(user.getSurname());
+        dto.setPersonID(user.getPersonID());
+        dto.setUuid(user.getUuid());
+        return dto;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteUserById(@PathVariable Long id) {
         Optional<User> user = userService.deleteUserById(id);
 
         if (user.isPresent()) {

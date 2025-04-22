@@ -29,7 +29,7 @@ public class UserController {
             return new ResponseEntity<>("Zadané personID není platné. Uživatel nelze vytvořit", HttpStatus.BAD_REQUEST);
         }
 
-        User savedUser = userService.saveUser(user);
+        userService.saveUser(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 

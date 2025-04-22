@@ -21,7 +21,7 @@ public class UserService {
 
     public UserService() {
         try {
-            readPersonID("resources/dataPersonId.txt", "\\s+");
+            readPersonID("resources/dataPersonId.txt");
         } catch (FileException e) {
             System.err.println("Nepodařilo se načíst personID: " + e.getMessage());
         }
@@ -42,7 +42,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void readPersonID(String fileName, String delimiter) throws FileException {
+    public void readPersonID(String fileName) throws FileException {
         int lineNumber = 0;
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))) {
             while (scanner.hasNextLine()) {
@@ -66,10 +66,10 @@ public class UserService {
         return availablePersonIDs.contains(personID);
     }
 
-    public User saveUser(User user) {
+    public void saveUser(User user) {
         String uuid = UUID.randomUUID().toString();
         user.setUuid(uuid);
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     public List<User> getAllUsers() {

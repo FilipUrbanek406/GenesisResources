@@ -1,4 +1,4 @@
-package cz.engeto.GenesisResources.DTO;
+package cz.engeto.genesisresources.DTO;
 
 import lombok.Data;
 

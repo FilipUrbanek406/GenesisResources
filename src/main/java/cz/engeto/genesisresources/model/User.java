@@ -1,4 +1,4 @@
-package cz.engeto.GenesisResources.model;
+package cz.engeto.genesisresources.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

@@ -1,8 +1,10 @@
-package cz.engeto.GenesisResources.service;
+package cz.engeto.genesisresources.service;
 
-import cz.engeto.GenesisResources.exception.FileException;
-import cz.engeto.GenesisResources.model.User;
-import cz.engeto.GenesisResources.repository.UserRepository;
+import cz.engeto.genesisresources.DTO.UserBasicDTO;
+import cz.engeto.genesisresources.DTO.UserDetailDTO;
+import cz.engeto.genesisresources.exception.FileException;
+import cz.engeto.genesisresources.model.User;
+import cz.engeto.genesisresources.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,6 +77,24 @@ public class UserService {
     public List<User> getAllUsers() {
 
         return userRepository.findAll();
+    }
+
+    public UserBasicDTO convertToBasicDTO(User user) {
+        UserBasicDTO dto = new UserBasicDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setSurname(user.getSurname());
+        return dto;
+    }
+
+    public UserDetailDTO convertToDetailDTO(User user) {
+        UserDetailDTO dto = new UserDetailDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setSurname(user.getSurname());
+        dto.setPersonID(user.getPersonID());
+        dto.setUuid(user.getUuid());
+        return dto;
     }
 
     public Optional<User> getUserById(Long id) {

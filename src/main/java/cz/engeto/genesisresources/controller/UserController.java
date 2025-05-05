@@ -1,14 +1,15 @@
-package cz.engeto.GenesisResources.controller;
+package cz.engeto.genesisresources.controller;
 
-import cz.engeto.GenesisResources.DTO.UserBasicDTO;
-import cz.engeto.GenesisResources.DTO.UserDetailDTO;
-import cz.engeto.GenesisResources.model.User;
-import cz.engeto.GenesisResources.service.UserService;
+import cz.engeto.genesisresources.DTO.UserBasicDTO;
+import cz.engeto.genesisresources.DTO.UserDetailDTO;
+import cz.engeto.genesisresources.model.User;
+import cz.engeto.genesisresources.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,9 +35,26 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(@RequestParam(required = false) Boolean detail) {
         List<User> users = userService.getAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+
+        if (Boolean.TRUE.equals(detail)) {
+            List<UserDetailDTO> detailDTOs = new ArrayList<>();
+
+            for (User user : users) {
+                UserDetailDTO detailDTO = userService.convertToDetailDTO(user);
+                detailDTOs.add(detailDTO);
+            }
+            return new ResponseEntity<>(detailDTOs, HttpStatus.OK);
+        } else {
+            List<UserBasicDTO> basicDTOs = new ArrayList<>();
+
+            for (User user : users) {
+                UserBasicDTO basicDTO = userService.convertToBasicDTO(user);
+                basicDTOs.add(basicDTO);
+            }
+            return new ResponseEntity<>(basicDTOs, HttpStatus.OK);
+        }
     }
 
     @GetMapping("/{id}")
@@ -51,30 +69,12 @@ public class UserController {
         User user = userOptional.get();
 
         if (Boolean.TRUE.equals(detail)) {
-            UserDetailDTO detailDTO = convertToDetailDTO(user);
+            UserDetailDTO detailDTO = userService.convertToDetailDTO(user);
             return new ResponseEntity<>(detailDTO, HttpStatus.OK);
         } else {
-            UserBasicDTO basicDTO = convertToBasicDTO(user);
+            UserBasicDTO basicDTO = userService.convertToBasicDTO(user);
             return new ResponseEntity<>(basicDTO, HttpStatus.OK);
         }
-    }
-
-    private UserBasicDTO convertToBasicDTO(User user) {
-        UserBasicDTO dto = new UserBasicDTO();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setSurname(user.getSurname());
-        return dto;
-    }
-
-    private UserDetailDTO convertToDetailDTO(User user) {
-        UserDetailDTO dto = new UserDetailDTO();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setSurname(user.getSurname());
-        dto.setPersonID(user.getPersonID());
-        dto.setUuid(user.getUuid());
-        return dto;
     }
 
     @PutMapping

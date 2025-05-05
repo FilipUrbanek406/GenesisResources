@@ -1,6 +1,6 @@
-package cz.engeto.GenesisResources.repository;
+package cz.engeto.genesisresources.repository;
 
-import cz.engeto.GenesisResources.model.User;
+import cz.engeto.genesisresources.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
